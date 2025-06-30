@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+DOTFILES_DIR="$HOME/nvim_dotfiles"
+NVIM_SRC="$DOTFILES_DIR/nvim"
+NVIM_DEST="$HOME/.config/nvim"
+BACKUP_DIR="$HOME/dotfiles_bak_$(date +%Y%m%d_%H%M%S)"
+CONFIG_SRC="$DOTFILES_DIR/config"
+CONFIG_DEST="$HOME/.config"
+
+# 備份現有 nvim 設定
+if [ -d "$NVIM_DEST" ] || [ -L "$NVIM_DEST" ]; then
+  echo "Backing up $NVIM_DEST to $BACKUP_DIR"
+  mkdir -p "$BACKUP_DIR"
+  mv "$NVIM_DEST" "$BACKUP_DIR/"
+fi
+
+# 建立 ~/.config 目錄（如果不存在）
+mkdir -p "$CONFIG_DEST"
+
+# Symlink all subdirectories in config (except nvim)
+if [ -d "$CONFIG_SRC" ]; then
+  for dir in "$CONFIG_SRC"/*; do
+    name=$(basename "$dir")
+    # Skip nvim, handled separately
+    if [ "$name" = "nvim" ]; then
+      continue
+    fi
+    target="$CONFIG_DEST/$name"
+    if [ -e "$target" ] || [ -L "$target" ]; then
+      echo "$target already exists, skipping."
+    else
+      ln -s "$dir" "$target"
+      echo "Symlinked $dir to $target"
+    fi
+  done
+fi
+
+# 建立 nvim symlink
+ln -s "$NVIM_SRC" "$NVIM_DEST"
+echo "Symlinked $NVIM_SRC to $NVIM_DEST" 
