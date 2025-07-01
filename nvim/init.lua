@@ -139,3 +139,14 @@ require("lazy").setup({
 vim.keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
 
 vim.opt.swapfile = false 
+
+-- Remap Orgmode checkbox toggle from <C-Space> to <Leader>c in org files
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'org',
+  callback = function()
+    vim.keymap.set('n', '<Leader>c', '<Cmd>OrgToggleCheckbox<CR>', { buffer = true, desc = 'Toggle Org checkbox' })
+    vim.keymap.set('n', '<Leader><Space>', function()
+      require("orgmode").action("org_mappings.toggle_checkbox")
+    end, { buffer = true, desc = 'Toggle Org checkbox (Leader+Space)' })
+  end,
+}) 
