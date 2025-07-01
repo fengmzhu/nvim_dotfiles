@@ -144,7 +144,6 @@ vim.opt.swapfile = false
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'org',
   callback = function()
-    vim.keymap.set('n', '<Leader>c', '<Cmd>OrgToggleCheckbox<CR>', { buffer = true, desc = 'Toggle Org checkbox' })
     vim.keymap.set('n', '<Leader><Space>', function()
       require("orgmode").action("org_mappings.toggle_checkbox")
     end, { buffer = true, desc = 'Toggle Org checkbox (Leader+Space)' })
