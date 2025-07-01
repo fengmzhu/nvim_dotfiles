@@ -7,6 +7,7 @@
   "marks.nvim": { "branch": "master", "commit": "f353e8c08c50f39e99a9ed474172df7eddd89b72" },
   "nvim-treesitter": { "branch": "master", "commit": "42fc28ba918343ebfd5565147a42a26580579482" },
   "nvim-web-devicons": { "branch": "master", "commit": "19d6211c78169e78bab372b585b6fb17ad974e82" },
+  "orgmode": { "branch": "master", "commit": "b6d14eb0a1553a0ef4114346d67605de82d0f7fb" },
   "undotree": { "branch": "master", "commit": "7a8b831e9bfb9f6fe05cc33294882648dd6801fb" },
   "vim-easy-align": { "branch": "master", "commit": "9815a55dbcd817784458df7a18acacc6f82b1241" },
   "vim-tmux-navigator": { "branch": "master", "commit": "412c474e97468e7934b9c217064025ea7a69e05e" },

@@ -116,6 +116,23 @@ require("lazy").setup({
     "christoomey/vim-tmux-navigator",
     lazy = false,
   },
+  -- orgmode for org files
+  {
+    "nvim-orgmode/orgmode",
+    event = "VeryLazy",
+    ft = { "org" },
+    config = function()
+      require('orgmode').setup({
+        org_agenda_files = '~/orgfiles/**/*',
+        org_default_notes_file = '~/orgfiles/refile.org',
+      })
+      -- If you use nvim-treesitter with ensure_installed = "all", add org to ignore_install
+      -- require('nvim-treesitter.configs').setup({
+      --   ensure_installed = 'all',
+      --   ignore_install = { 'org' },
+      -- })
+    end,
+  },
 })
 
 -- Insert mode: jk 跳回 normal mode
