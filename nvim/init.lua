@@ -9,6 +9,8 @@ vim.keymap.set("n", "<leader>qa", ":qa<CR>")
 vim.keymap.set("n", "<leader>qaa", ":qa!<CR>")
 vim.keymap.set("n", "<leader>w", ":w!<CR>")
 vim.keymap.set("n", "<leader>wq", ":wq!<CR>")
+-- <leader>ev: open init.lua
+vim.keymap.set("n", "<leader>ev", ":edit $MYVIMRC<CR>", { desc = "Edit init.lua" })
 
 -- lazy.nvim 啟動
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -133,6 +135,15 @@ require("lazy").setup({
       -- })
     end,
   },
+  -- Telescope fuzzy finder
+  {
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = "Telescope",
+    config = function()
+      require('telescope').setup{}
+    end,
+  },
 })
 
 -- Insert mode: jk 跳回 normal mode
@@ -149,3 +160,9 @@ vim.api.nvim_create_autocmd('FileType', {
     end, { buffer = true, desc = 'Toggle Org checkbox (Leader+Space)' })
   end,
 }) 
+
+-- Telescope keymaps
+vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Find Files" })
+vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<CR>", { desc = "Live Grep" })
+vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "Buffers" })
+vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { desc = "Help Tags" }) 
