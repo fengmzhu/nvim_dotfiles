@@ -151,7 +151,29 @@ require("lazy").setup({
     dependencies = { "nvim-lua/plenary.nvim" },
     cmd = "Telescope",
     config = function()
-      require('telescope').setup{}
+      local actions = require('telescope.actions')
+      local action_state = require('telescope.actions.state')
+
+      require('telescope').setup({
+        defaults = {
+          mappings = {
+            i = {
+              ["<C-n>"] = function(prompt_bufnr)
+                local current_picker = action_state.get_current_picker(prompt_bufnr)
+                local prompt = current_picker:_get_prompt()
+                local cwd = current_picker.cwd or vim.loop.cwd()
+                actions.close(prompt_bufnr)
+                if prompt ~= nil and prompt ~= "" then
+                  local path = cwd .. "/" .. prompt
+                  vim.cmd('edit ' .. vim.fn.fnameescape(path))
+                else
+                  vim.notify("No file name provided!", vim.log.levels.WARN)
+                end
+              end,
+            },
+          },
+        },
+      })
     end,
   },
   -- neo-tree file explorer
