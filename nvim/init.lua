@@ -56,7 +56,12 @@ require("lazy").setup({
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
-      require("lualine").setup({ options = { theme = "auto" } })
+      require("lualine").setup({
+        options = { theme = "auto" },
+        sections = {
+          lualine_c = { { 'filename', path = 2 } }, -- Show absolute file path
+        },
+      })
     end,
   },
   -- 6. LuaSnip (UltiSnips 替代)
@@ -124,15 +129,20 @@ require("lazy").setup({
     event = "VeryLazy",
     ft = { "org" },
     config = function()
+      -- Set orgfiles folder path for reuse
+      local orgfiles_path = '/mnt/c/Users/greed/Dropbox/Favorite/Notes/orgfiles'
+      local org_refile_path = orgfiles_path .. '/refile.org'
+
       require('orgmode').setup({
-        org_agenda_files = '~/orgfiles/**/*',
-        org_default_notes_file = '~/orgfiles/refile.org',
+        org_agenda_files = orgfiles_path .. '/**/*',
+        org_default_notes_file = org_refile_path,
       })
-      -- If you use nvim-treesitter with ensure_installed = "all", add org to ignore_install
-      -- require('nvim-treesitter.configs').setup({
-      --   ensure_installed = 'all',
-      --   ignore_install = { 'org' },
-      -- })
+      vim.keymap.set("n", "<leader>on", function()
+        vim.cmd('edit ' .. org_refile_path)
+      end, { desc = "Open org default notes file" })
+      vim.keymap.set("n", "<leader>fo", function()
+        require('telescope.builtin').find_files({ cwd = orgfiles_path })
+      end, { desc = "Find Org Files" })
     end,
   },
   -- Telescope fuzzy finder
@@ -142,6 +152,25 @@ require("lazy").setup({
     cmd = "Telescope",
     config = function()
       require('telescope').setup{}
+    end,
+  },
+  -- neo-tree file explorer
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
+    config = function()
+      require("neo-tree").setup({
+        filesystem = {
+          filtered_items = {
+            visible = true, -- Show hidden files by default
+          },
+        },
+      })
     end,
   },
 })
@@ -165,4 +194,7 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Find Files" })
 vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<CR>", { desc = "Live Grep" })
 vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "Buffers" })
-vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { desc = "Help Tags" }) 
+vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { desc = "Help Tags" })
+vim.keymap.set("n", "<leader>fo", function()
+  require('telescope.builtin').find_files({ cwd = orgfiles_path })
+end, { desc = "Find Org Files" }) 
