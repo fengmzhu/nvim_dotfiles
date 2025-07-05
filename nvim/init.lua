@@ -1,16 +1,67 @@
 -- 基本設定
 vim.g.mapleader = " "
 vim.g.maplocalleader = ","
+vim.o.autochdir       = true --cursor says it will confuse some plugin
 
+-- Clipboard settings
+vim.opt.clipboard = "unnamedplus"  -- Use system clipboard for all operations
+
+local map = vim.keymap.set
+local opts = { noremap = true, silent = true}
 -- 快捷鍵：<leader>q, wq, qq, qa
-vim.keymap.set("n", "<leader>q", ":q<CR>")
-vim.keymap.set("n", "<leader>qq", ":q!<CR>")
-vim.keymap.set("n", "<leader>qa", ":qa<CR>")
-vim.keymap.set("n", "<leader>qaa", ":qa!<CR>")
-vim.keymap.set("n", "<leader>w", ":w!<CR>")
-vim.keymap.set("n", "<leader>wq", ":wq!<CR>")
+map("n", "<leader>q", ":q<CR>")
+map("n", "<leader>qq", ":q!<CR>")
+map("n", "<leader>qa", ":qa<CR>")
+map("n", "<leader>qaa", ":qa!<CR>")
+map("n", "<leader>w", ":w!<CR>")
+map("n", "<leader>wq", ":wq!<CR>")
+
+map('i', ';;', '<C-x><C-p>', {noremap = true, silent = true})
+
+-- Navigate splits with Ctrl + hjkl
+map('n', '<C-h>', '<C-w>h', { desc = 'Move to left split' })
+map('n', '<C-j>', '<C-w>j', { desc = 'Move to split below' })
+map('n', '<C-k>', '<C-w>k', { desc = 'Move to split above' })
+map('n', '<C-l>', '<C-w>l', { desc = 'Move to right split' })
+
+-- 水平宽度调整
+map('n', '<leader>l',   ':vertical resize +2<CR>',  opts)
+map('n', '<leader>ll',  ':vertical resize +10<CR>', opts)
+map('n', '<leader>lll', ':vertical resize +30<CR>', opts)
+map('n', '<leader>h',   ':vertical resize -2<CR>',  opts)
+map('n', '<leader>hh',  ':vertical resize -10<CR>', opts)
+map('n', '<leader>hhh', ':vertical resize -30<CR>', opts)
+
+-- 垂直高度调整
+map('n', '<leader>j',   ':resize +2<CR>',  opts)
+map('n', '<leader>jj',  ':resize +10<CR>', opts)
+map('n', '<leader>jjj', ':resize +30<CR>', opts)
+map('n', '<leader>k',   ':resize -2<CR>',  opts)
+map('n', '<leader>kk',  ':resize -10<CR>', opts)
+map('n', '<leader>kkk', ':resize -30<CR>', opts)
+
 -- <leader>ev: open init.lua
-vim.keymap.set("n", "<leader>ev", ":edit $MYVIMRC<CR>", { desc = "Edit init.lua" })
+map("n", "<leader>ev", ":edit $MYVIMRC<CR>", { desc = "Edit init.lua" })
+
+-- Enable view saving
+vim.opt.viewoptions = "folds,cursor,curdir"
+
+-- Create a directory for storing view files if it doesn't exist
+local view_dir = vim.fn.stdpath('data') .. '/view'
+if vim.fn.isdirectory(view_dir) == 0 then
+    vim.fn.mkdir(view_dir, 'p')
+end
+
+-- Your existing autocommands for remembering folds
+vim.cmd[[
+  augroup remember_folds
+    autocmd!
+    " Save view (folds, cursor, etc.)
+    autocmd BufWinLeave * if expand('%') != '' && &buftype !~ 'nofile' | mkview | endif
+    " Load view
+    autocmd BufWinEnter * if expand('%') != '' && &buftype !~ 'nofile' | silent! loadview | endif
+  augroup END
+]]
 
 -- lazy.nvim 啟動
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -130,18 +181,18 @@ require("lazy").setup({
     ft = { "org" },
     config = function()
       -- Set orgfiles folder path for reuse
-      local orgfiles_path = '/mnt/c/Users/greed/Dropbox/Favorite/Notes/orgfiles'
-      local org_refile_path = orgfiles_path .. '/refile.org'
+      local org_path = '/mnt/c/Users/greed/Dropbox/Favorite/Notes/org'
+      local org_refile_path = org_path .. '/orgfiles/refile.org'
 
       require('orgmode').setup({
-        org_agenda_files = orgfiles_path .. '/**/*',
+        org_agenda_files = org_path .. '/orgfiles/**/*',
         org_default_notes_file = org_refile_path,
       })
       vim.keymap.set("n", "<leader>on", function()
         vim.cmd('edit ' .. org_refile_path)
       end, { desc = "Open org default notes file" })
       vim.keymap.set("n", "<leader>fo", function()
-        require('telescope.builtin').find_files({ cwd = orgfiles_path })
+        require('telescope.builtin').find_files({ cwd = org_path })
       end, { desc = "Find Org Files" })
     end,
   },
@@ -175,6 +226,61 @@ require("lazy").setup({
         },
       })
     end,
+  },
+  {
+    "nvim-orgmode/telescope-orgmode.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "nvim-orgmode/orgmode",
+      "nvim-telescope/telescope.nvim",
+    },
+    config = function()
+      -- Add this line to ensure Telescope is loaded before the extension
+      require("telescope").setup()
+      
+      require("telescope").load_extension("orgmode")
+
+      vim.keymap.set("n", "<leader>r", require("telescope").extensions.orgmode.refile_heading)
+      vim.keymap.set("n", "<leader>fh", require("telescope").extensions.orgmode.search_headings)
+      vim.keymap.set("n", "<leader>li", require("telescope").extensions.orgmode.insert_link)
+    end,
+  },
+  -- org-roam.nvim for Zettelkasten-style note-taking
+  {
+    "chipsenkbeil/org-roam.nvim",
+    tag = "0.1.1",
+    dependencies = {
+      {
+        "nvim-orgmode/orgmode",
+        tag = "0.3.7",
+      },
+    },
+    config = function()
+      local org_path = '/mnt/c/Users/greed/Dropbox/Favorite/Notes/org'
+      local org_roam_path = org_path .. '/org_roam'
+      require("org-roam").setup({
+        org_agenda_files = org_roam_path .. '/**/*',
+        directory = org_roam_path,
+        mappings = {
+          org_roam_buffer = {
+            ["<leader>rb"] = "org_roam_buffer_toggle",
+            ["<leader>ri"] = "org_roam_buffer_insert",
+            ["<leader>rf"] = "org_roam_buffer_find",
+            ["<leader>rg"] = "org_roam_buffer_grep",
+          },
+          org_roam_ui = {
+            ["<leader>rd"] = "org_roam_ui_open",
+            ["<leader>rs"] = "org_roam_ui_show",
+          },
+        },
+      })
+      
+      -- Create org_roam directory if it doesn't exist
+      local org_roam_dir = vim.fn.expand(org_roam_path)
+      if vim.fn.isdirectory(org_roam_dir) == 0 then
+        vim.fn.mkdir(org_roam_dir, 'p')
+      end
+    end
   },
   -- neo-tree file explorer
   {
