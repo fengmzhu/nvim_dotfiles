@@ -1,4 +1,4 @@
-# nvim_dotfiles
+# nvim_dotfiles 
 
 Personal Neovim and related config dotfiles, with setup automation for `~/.config` symlinks. Includes backup and easy restore script.
 
