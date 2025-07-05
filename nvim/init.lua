@@ -96,10 +96,11 @@ require("lazy").setup({
   {
     "vimwiki/vimwiki",
     init = function()
-      vim.g.vimwiki_list = { { path = '~/vimwiki/', syntax = 'markdown', ext = '.md' } }
+      vim.g.vimwiki_list = { { path = '/mnt/c/Users/greed/Dropbox/Favorite/Notes/vimwiki/', syntax = 'markdown', ext = '.md' } }
     end,
     keys = {
       { "<leader>ww", ":VimwikiIndex<CR>", desc = "Vimwiki Index" },
+      { "<leader>vw", ":vs /mnt/c/Users/greed/Dropbox/Favorite/Notes/vimwiki/index.md<CR>", desc = "Vimwiki Index" },
     },
   },
   -- 5. lualine.nvim (airline 替代)
